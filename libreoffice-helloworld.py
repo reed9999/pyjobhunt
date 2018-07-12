@@ -3,10 +3,9 @@
 
 #See also
 #https://askubuntu.com/questions/325163/missing-python-in-libreoffice-organize-macros-menu
+# https://forum.openoffice.org/en/forum/viewtopic.php?f=45&t=78036
 
-#Invoke LibreOffice with
-# soffice --writer --accept="socket,host=localhost,port=2002;urp;StarOffice.ServiceManager"
-
+# See start-libreoffice.sh to invoke.
 
 
 import uno
