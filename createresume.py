@@ -30,15 +30,30 @@ class ResumeCreator:
         self.current_writer_doc = self.desktop.getCurrentComponent()
         return self.current_writer_doc
 
+    def create_table(self, rows, columns):
+        table_string = "com.sun.star.text.TextTable"  # https://wiki.openoffice.org/wiki/Writer/API/Tables
+        the_table = self.current_writer_doc.createInstance(table_string)
+        the_table.initialize(rows, columns)
+        return the_table
+
     def create_new_file(self):
         try:
             # https://wiki.openoffice.org/wiki/Writer/API/Overview#Creating.2C_opening_a_Writer_Document
-            newdoc = self.desktop.loadComponentFromURL("private:factory/swriter",
-                                                  "_blank", 0,
-                                                  [])
+            newdoc = self.desktop.loadComponentFromURL(
+                "private:factory/swriter", "_blank", 0, [])
         except:
             raise RuntimeWarning("Creating a new doc didn't work.")
+        self.current_writer_doc = newdoc
         return newdoc
+
+    def make_table_and_paragraph_for_job(self, job_details, current_doc=None):
+        current_doc = current_doc or self.current_writer_doc
+        self.current_writer_doc = current_doc
+        table=self.create_table(1, 2)
+        for cellname in table.getCellNames():
+            print(cellname)
+            cell = table.getCellByName(cellname)
+            cell.setFormula("'{}'".format(cellname))
 
 
 def create_a_table(file, rows, columns):
@@ -78,6 +93,7 @@ def main():
     new_file = creator.create_new_file()
     content = [7, 3, 5]
     add_content_to_file(content, new_file)
+    creator.make_table_and_paragraph_for_job(None)
 
 if __name__ == "__main__":
     main()

@@ -6,7 +6,7 @@
 # https://forum.openoffice.org/en/forum/viewtopic.php?f=45&t=78036
 
 # See start-libreoffice.sh to invoke.
-
+#Also interesting https://www.openoffice.org/udk/common/man/tutorial/office_automation.html
 
 import uno
 
@@ -39,6 +39,19 @@ def part1():
     another_cursor = model.getCurrentController().getViewCursor()
     text.insertString( another_cursor, "Howdy Woild", 0 )
 
+    table_string = "com.sun.star.text.TextTable" 
+    the_table = model.createInstance(table_string)
+    the_table.initialize(2,3)
+
+    text.insertTextContent(another_cursor, the_table, 0)
+
+    #https://onesheep.org/scripting-libreoffice-python/
+    search = model.createSearchDescriptor()
+    search.setPropertyValue('SearchRegularExpression', True)
+    search.setSearchString('Woild')
+    search.setReplaceString('World [which i changed from woild]')
+    replaced = model.replaceAll(search)
+    return
 
     #https://wiki.openoffice.org/wiki/Writer/API/TextRange --> Paragraphs
     the_enum = model.getText().createEnumeration()
@@ -80,7 +93,7 @@ def part3():
     # print(dir(active_frame))
 
 if True:
-    part3()
+    part1()
 else:
     part1()
     part2()
