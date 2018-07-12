@@ -36,14 +36,18 @@ def create_new_file(desktop):
         raise RuntimeWarning("Creating a new doc didn't work.")
     return newdoc
 
+def create_a_table(file, rows, columns):
+    table_string = "com.sun.star.text.TextTable"  # https://wiki.openoffice.org/wiki/Writer/API/Tables
+    the_table = file.createInstance(table_string)
+    the_table.initialize(rows, columns)
+    return the_table
+
+
 def add_item_to_file(item, file):
     the_text = file.Text
     the_cursor = the_text.createTextCursor()
     the_text.insertString(the_cursor, "Behold a table", 0)
-    table_string = "com.sun.star.text.TextTable"     #https://wiki.openoffice.org/wiki/Writer/API/Tables
-    the_table = file.createInstance(table_string)
-    the_table.initialize(item, item)
-
+    the_table = create_a_table(file, item, item)
 
     the_text.insertTextContent(the_cursor, the_table, 0)
 
@@ -66,7 +70,7 @@ def part1():
 def main():
     setup = set_up()
     new_file = create_new_file(setup['desktop'])
-    content = [1, 2, 3]
+    content = [7, 3, 5]
     add_content_to_file(content, new_file)
 
 if __name__ == "__main__":
