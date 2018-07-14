@@ -1,6 +1,12 @@
 import uno
+import time
 
 JOB_DETAILS1 = {
+    'employer': 'Amazon',
+    'city': 'Seattle',
+    'state': 'WA',
+}
+JOB_DETAILS2 = {
     'employer': 'University of Michigan Information and Technology Services',
     'city': 'Ann Arbor',
     'state': 'MI',
@@ -52,9 +58,8 @@ class ResumeCreator:
         return newdoc
 
     def insert_job(self, job_details, current_doc=None):
-        current_doc = current_doc or self.current_writer_doc
-        table = self.make_table_and_paragraph_for_job(job_details, current_doc)
-        self.insert_table(table)
+        self.current_writer_doc = current_doc or self.current_writer_doc
+        table = self.insert_table_for_job(job_details)
         self.insert_rest_of_the_junk(job_details)
 
     def insert_rest_of_the_junk(self, job_details):
@@ -67,22 +72,27 @@ class ResumeCreator:
         cursor = text.createTextCursor()
         text.insertTextContent(cursor, table, 0)
 
-    def make_table_and_paragraph_for_job(self, job_details, current_doc=None):
-        current_doc = current_doc or self.current_writer_doc
-        self.current_writer_doc = current_doc
-        the_table = self.create_table(1, 2)
-        self.insert_table(the_table)
+    def insert_table_for_job(self, job_details):
+        table = self.create_table(1, 2)
+        self.insert_table(table)
+        table.getCellByName("A1").setString(job_details['employer'])
+        table.getCellByName("B1").setString(job_details['city'])
 
-        all_tables = current_doc.getTextTables()
-        some_table = all_tables.getByIndex(0)
-        cursor = some_table.createCursorByCellName("A1")
-        for cellname in the_table.getCellNames():
-            print(cellname)
-            cell = the_table.getCellByName(cellname)
-            cell.setString("This cell is {}".format(cellname))
-        return the_table
+        # all_tables = current_doc.getTextTables()
+        # some_table = all_tables.getByIndex(0)
+        # cursor = some_table.createCursorByCellName("A1")
+        # for cellname in the_table.getCellNames():
+        #     print(cellname)
+        #     cell = the_table.getCellByName(cellname)
+        #     cell.setString("This cell is {}".format(cellname))
+        return table
 
-
+    def terminate(self):
+        fn = time.time()*1000.0
+        self.current_writer_doc.storeAsURL("file:///~/temp/{}.odt".format(fn),
+                                           [])
+        print ("Saved as {}".format(fn))
+        self.current_writer_doc.close(1)
 
 def main():
     creator=ResumeCreator()
@@ -90,6 +100,7 @@ def main():
     new_file = creator.create_new_file()
 
     creator.insert_job(JOB_DETAILS1)
+    creator.terminate()
 
 if __name__ == "__main__":
     main()
