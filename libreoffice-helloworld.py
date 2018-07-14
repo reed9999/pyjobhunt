@@ -35,11 +35,8 @@ def part1():
     text = model.Text
     cursor = text.createTextCursor()
 
-    text.insertString( cursor, "Bambambooyah", 0 )
-    another_cursor = model.getCurrentController().getViewCursor()
-    text.insertString( another_cursor, "Howdy Woild", 0 )
-
-    table_string = "com.sun.star.text.TextTable" 
+    text.insertString( cursor, "This will be a doc with a 2x3 table", 0 )
+    table_string = "com.sun.star.text.TextTable"
     the_table = model.createInstance(table_string)
     the_table.initialize(2,3)
 
@@ -65,6 +62,45 @@ def part1():
     print(dir(text))
 
 
+
+def part5():
+
+    # access the document's text property
+    text = model.Text
+    cursor = text.createTextCursor()
+
+    text.insertString( cursor, "Hello LaTonya\n", 0 )
+    text.insertString( cursor, "This is a table\n", 0 )
+    table_string = "com.sun.star.text.TextTable"
+    the_table = model.createInstance(table_string)
+    the_table.initialize(2,3)
+
+    text.insertTextContent(cursor, the_table, 0)
+
+
+
+def part4():
+
+    # access the document's text property
+    text = model.Text
+    cursor = text.createTextCursor()
+
+    text.insertString( cursor, "Bambambooyah", 0 )
+    another_cursor = model.getCurrentController().getViewCursor()
+    text.insertString( another_cursor, "Howdy Woild", 0 )
+
+    table_string = "com.sun.star.text.TextTable"
+    the_table = model.createInstance(table_string)
+    the_table.initialize(2,3)
+
+    text.insertTextContent(another_cursor, the_table, 0)
+
+    #https://onesheep.org/scripting-libreoffice-python/
+    search = model.createSearchDescriptor()
+    search.setPropertyValue('SearchRegularExpression', True)
+    search.setSearchString('Woild')
+    search.setReplaceString('World [which i changed from woild]')
+    replaced = model.replaceAll(search)
 
 def part2():
     desktop.terminate()
@@ -93,7 +129,7 @@ def part3():
     # print(dir(active_frame))
 
 if True:
-    part1()
+    part5()
 else:
     part1()
     part2()
