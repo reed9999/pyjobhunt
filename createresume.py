@@ -1,16 +1,22 @@
 import uno
+import datetime
 import time
 
 JOB_DETAILS1 = {
-    'employer': 'Amazon',
+    'employer': 'The Startup Company',
+    'title': 'Poobah',
     'city': 'Seattle',
-    'state': 'WA',
+    'location2': 'WA',
+    'start': datetime.date(2014, 7, 1),
+    'end': datetime.date(2018, 4, 1),
+    'duties': 'Founded a company and executed a high-growth strategy',
+    'accomplishments': [
+        'grew by 98% first year',
+        'retained 70% of employees over three year period',
+        'negotiated an acquisition netting investors a 35-fold return',
+    ]
 }
-JOB_DETAILS2 = {
-    'employer': 'University of Michigan Information and Technology Services',
-    'city': 'Ann Arbor',
-    'state': 'MI',
-}
+
 class ResumeCreator:
 
     def set_up(self):
@@ -42,16 +48,19 @@ class ResumeCreator:
         return self.current_writer_doc
 
     def create_table(self, rows, columns):
-        table_string = "com.sun.star.text.TextTable"  # https://wiki.openoffice.org/wiki/Writer/API/Tables
-        the_table = self.current_writer_doc.createInstance(table_string)
+        TABLE_STRING = "com.sun.star.text.TextTable"  # https://wiki.openoffice.org/wiki/Writer/API/Tables
+        the_table = self.current_writer_doc.createInstance(TABLE_STRING)
         the_table.initialize(rows, columns)
         return the_table
 
     def create_new_file(self):
+        # https://wiki.openoffice.org/wiki/Writer/API/Overview#Creating.2C_opening_a_Writer_Document
+        SWRITER = "private:factory/swriter"
+        BLANK = "_blank"
+        FALSE = 0
         try:
-            # https://wiki.openoffice.org/wiki/Writer/API/Overview#Creating.2C_opening_a_Writer_Document
             newdoc = self.desktop.loadComponentFromURL(
-                "private:factory/swriter", "_blank", 0, [])
+                SWRITER, BLANK, FALSE, [])
         except:
             raise RuntimeWarning("Creating a new doc didn't work.")
         self.current_writer_doc = newdoc
@@ -60,12 +69,15 @@ class ResumeCreator:
     def insert_job(self, job_details, current_doc=None):
         self.current_writer_doc = current_doc or self.current_writer_doc
         table = self.insert_table_for_job(job_details)
-        self.insert_rest_of_the_junk(job_details)
+        paragraph = self.insert_paragraph_for_job(job_details)
 
-    def insert_rest_of_the_junk(self, job_details):
+    def insert_paragraph_for_job(self, job_details):
         text = self.current_writer_doc.Text
         cursor = text.createTextCursor()
-        text.insertString(cursor, job_details.__repr__(), 0)
+        for bullet_point in job_details['accomplishments']:
+            text.insertString(cursor, "* ", 0)
+            text.insertString(cursor, bullet_point, 0)
+            text.insertString(cursor, "\n", 0)
 
     def insert_table(self, table):
         text = self.current_writer_doc.Text
@@ -75,8 +87,13 @@ class ResumeCreator:
     def insert_table_for_job(self, job_details):
         table = self.create_table(1, 2)
         self.insert_table(table)
-        table.getCellByName("A1").setString(job_details['employer'])
-        table.getCellByName("B1").setString(job_details['city'])
+        jd = job_details
+        left_side = "{}, {}, {}\n{}".format(
+            jd['employer'], jd['city'], jd['location2'], jd['title']
+        )
+        right_side = "start date - end date"
+        table.getCellByName("A1").setString(left_side)
+        table.getCellByName("B1").setString(right_side)
 
         # all_tables = current_doc.getTextTables()
         # some_table = all_tables.getByIndex(0)
@@ -92,7 +109,7 @@ class ResumeCreator:
         self.current_writer_doc.storeAsURL("file:///~/temp/{}.odt".format(fn),
                                            [])
         print ("Saved as {}".format(fn))
-        self.current_writer_doc.close(1)
+        # self.current_writer_doc.close(1)
 
 def main():
     creator=ResumeCreator()
