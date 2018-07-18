@@ -95,9 +95,12 @@ class ResumeCreator:
         table.getCellByName("A1").setString(left_side)
         table.getCellByName("B1").setString(right_side)
 
-        # all_tables = current_doc.getTextTables()
-        # some_table = all_tables.getByIndex(0)
-        # cursor = some_table.createCursorByCellName("A1")
+#https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Named_Table_Cells_in_Rows,_Columns_and_the_Table_Cursor
+        cursor = table.createCursorByCellName("A1")
+        print(cursor.getImplementationName())
+        cursor.goRight(5, False)
+        cursor.paraStyle = "Normal"
+#        cursor.letterStyle = "R Employer"
         # for cellname in the_table.getCellNames():
         #     print(cellname)
         #     cell = the_table.getCellByName(cellname)
